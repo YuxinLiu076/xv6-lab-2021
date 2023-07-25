@@ -2,6 +2,7 @@ struct stat;
 struct rtcdate;
 struct sysinfo;
 
+// the following system calls should also exist in usys.pl
 // system calls
 int fork(void);
 int exit(int) __attribute__((noreturn));
@@ -24,6 +25,7 @@ int getpid(void);
 char* sbrk(int);
 int sleep(int);
 int uptime(void);
+// add trace system call
 int trace(int);
 int sysinfo(struct sysinfo*);
 
