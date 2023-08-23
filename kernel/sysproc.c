@@ -99,7 +99,8 @@ sys_uptime(void)
 uint64
 sys_trace(void){
   int n;
-  
+
+  // argint(0, &n) will get the 1st argument and save to the address of n, so n's value is the 1st argument
   if(argint(0, &n) < 0)
 	 return -1;  
   myproc()->trace_mask = n;

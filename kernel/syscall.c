@@ -104,6 +104,7 @@ extern uint64 sys_unlink(void);
 extern uint64 sys_wait(void);
 extern uint64 sys_write(void);
 extern uint64 sys_uptime(void);
+// add sys_trace here to call from sysproc.c
 extern uint64 sys_trace(void);
 extern uint64 sys_sysinfo(void);
 
@@ -132,7 +133,9 @@ static uint64 (*syscalls[])(void) = {
 [SYS_trace]   sys_trace,
 [SYS_sysinfo]    sys_sysinfo,
 };
+// add [SYS_trace]   sys_trace here to use syscalls as array to call function sys_trace
 
+// add array nums_syscall here to print different sys_call's trace
 static char* num_syscall[23] = {
 "fork",
 "exit",
@@ -160,27 +163,21 @@ static char* num_syscall[23] = {
 };
 
 void
-syscall(void)
-{
-  int num;
-  struct proc *p = myproc();
+syscall(void) {
+    int num;
+    // *p is the proc, p is the address of proc
+    struct proc *p = myproc();
 
-  num = p->trapframe->a7;
-  if(num > 0 && num < NELEM(syscalls) && syscalls[num]) {
-    p->trapframe->a0 = syscalls[num]();
-    //int i;
-    //for(i = 1; i <= 22; i++){
-    //  int mask = 1 << i;
-    //  if(mask > p->trace_mask){
-    //    break;
-    //  }
-    //  if(mask & p->trace_mask){
-    if((1 << num) & p->trace_mask){ 
-       printf("%d: syscall %s -> %d\n", p->pid, num_syscall[num-1], p->trapframe->a0);
-      } 
-  } else {
-    printf("%d %s: unknown sys call %d\n",
-            p->pid, p->name, num);
-    p->trapframe->a0 = -1;
-  }
+    // System call numbers like 22 for "SYS_trace" will be loaded into register a7
+    num = p->trapframe->a7;
+    if (num > 0 && num < NELEM(syscalls) && syscalls[num]) {
+        // syscalls[num]() will return the 1st parameter like for "systrace()" in sysproc.c will return the trace_mask
+        p->trapframe->a0 = syscalls[num]();
+        if ((1 << num) & p->trace_mask) {
+            printf("%d: syscall %s -> %d\n", p->pid, num_syscall[num - 1], p->trapframe->a0);
+        }
+    } else {
+        printf("%d %s: unknown sys call %d\n", p->pid, p->name, num);
+        p->trapframe->a0 = -1;
+    }
 }

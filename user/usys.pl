@@ -15,7 +15,7 @@ sub entry {
     print " ret\n";
 }
 
-# add entry for different system calls in user/ulib.c so that after usys.pl generated user/usys.S, they will be called as syscall in kernel mode using RISC-V's ecall instruction
+# add entry for different system calls in user/user.h so that after usys.pl generated user/usys.S, they will be called as syscall in kernel mode using RISC-V's ecall instruction
 entry("fork");
 entry("exit");
 entry("wait");
